@@ -1,0 +1,11 @@
+JSMaze
+======
+Robert Larsen <robert@the-playground.dk>
+
+Introduction
+------------
+This project contains datastructures and algorithms for generating mazes
+in JavaScript. The mazes can be rendered using a canvas element, but can
+also be rendered in a html table with a little more work.
+
+// vim: set syntax=asciidoc:
