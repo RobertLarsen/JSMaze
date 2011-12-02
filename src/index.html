@@ -2,7 +2,7 @@
 <html>
     <head>
         <script src="maze.js"></script>
-        <script src="hexmaze.js"></script>
+        <script src="circmaze.js"></script>
         <script src="generator.js"></script>
         <script src="dfs.js"></script>
         <script src="prim.js"></script>
@@ -25,11 +25,19 @@
 
             function createMazeAndCanvas(div, algorithm, radius) {
                 var canvas = div.getElementsByTagName('canvas')[0];
-                var halfHeight = Math.sin(HexMaze.PI2_6) * radius;
-                var cols = Math.floor((canvas.width - radius*7) / (radius * 2.5));
-                var rows = Math.floor((canvas.height - halfHeight) / halfHeight);
             
-                maze = new HexMaze(rows, cols, radius);
+                maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 5, 30);
+                maze.eachCell(function(c) {
+                    var str = c.toString() + ': ';
+                    var i = 0;
+                    c.getAllNeighbours().forEach(function(n) {
+                        if (i++ > 0) {
+                            str += ', ';
+                        }
+                        str += n.toString();
+                    });
+                    console.log(str);
+                });
             
                 var headline = document.createElement('h3');
                 headline.appendChild(document.createTextNode(algorithm.name));
@@ -38,8 +46,8 @@
                 //canvas.setAttribute('height', "" + div.offsetHeight);
             
                 div.appendChild(headline);
-                div.appendChild(canvas);
-                algorithm.initialize(maze);
+                //div.appendChild(canvas);
+                //algorithm.initialize(maze);
             
 
                 return {
@@ -68,27 +76,27 @@
                     drawMaze(o.canvas, o.maze);
                 });
 
-                var interval = undefined;
+                //var interval = undefined;
 
-                var nextStep = function() {
-                    var madeStep = false;
-                    var stepsToDo = 5;
-                    for (var i = 0; madeStep === false && i < objs.length; i++) {
-                        var obj = objs[i];
-                        for (var j = 0; j < stepsToDo && obj.algorithm.step(); j++) {
-                            madeStep = true;
-                        }
-                        if (madeStep) {
-                            drawMaze(obj.canvas, obj.maze);
-                        }
-                    }
-                    if (!madeStep) {
-                        clearInterval(interval);
-                        alert("Done");
-                    }
-                };
+                //var nextStep = function() {
+                //    var madeStep = false;
+                //    var stepsToDo = 5;
+                //    for (var i = 0; madeStep === false && i < objs.length; i++) {
+                //        var obj = objs[i];
+                //        for (var j = 0; j < stepsToDo && obj.algorithm.step(); j++) {
+                //            madeStep = true;
+                //        }
+                //        if (madeStep) {
+                //            drawMaze(obj.canvas, obj.maze);
+                //        }
+                //    }
+                //    if (!madeStep) {
+                //        clearInterval(interval);
+                //        alert("Done");
+                //    }
+                //};
 
-                interval = setInterval(nextStep, 50);
+                //interval = setInterval(nextStep, 50);
             }
         </script>
         <style>
@@ -101,8 +109,8 @@
         </style>
     </head>
     <body onLoad="startMaze();">
-        <div class="maze" id="prim"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div>
+        <!--div class="maze" id="prim"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div-->
         <div class="maze" id="krushkal"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div>
-        <div class="maze" id="dfs"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div>
+        <!--div class="maze" id="dfs"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div-->
     </body>
 </html>
