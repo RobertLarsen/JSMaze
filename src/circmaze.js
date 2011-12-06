@@ -106,7 +106,7 @@ CircMaze.Cell.prototype.paintWallTo = function(context, neighbour) {
 CircMaze.Cell.prototype.wallIsMine = function(neighbour) {
     var anglesEqual = function(a1, a2) {
         var diff = Math.abs(a1 - a2);
-        return diff < 0.00001 || (diff - Math.PI * 2) < 0.00001;
+        return diff < 0.00001 || Math.abs(diff - Math.PI * 2) < 0.00001;
     };
     var result = this._ring._nr === (neighbour._ring._nr - 1) ||
            (this._ring === neighbour._ring &&
@@ -148,7 +148,7 @@ CircMaze.Cell.prototype.breakWallTo = function(neighbour) {
     if (this.wallIsMine(neighbour)) {
         this._walls['w' + neighbour.getId()] = false;
     } else {
-        return neighbour.breakWallTo(this);
+        neighbour.breakWallTo(this);
     }
 };
 
