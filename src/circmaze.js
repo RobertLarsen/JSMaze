@@ -4,7 +4,9 @@ var CircMaze = function(x, y, diameter, rings, minCellCircumference) {
     this._diameter = diameter;
     this._minCellCircumference = minCellCircumference;
     this._rings = [];
-    for (var i = 0; i < rings; i++) {
+    this._rings.push(new CircMaze.Ring(this, 0, diameter / 2 / rings, 1));
+    this._rings.push(new CircMaze.Ring(this, 1, diameter / 2 / rings * 2, this._rings[0].calculateNumCells()));
+    for (var i = 2; i < rings; i++) {
         this._rings.push(new CircMaze.Ring(this, i, diameter / 2 / rings * (i + 1)));
     }
     this.eachCell(function(c) {
@@ -170,12 +172,12 @@ CircMaze.Cell.prototype.getAllNeighbours = function() {
     return this._neighbours;
 };
 
-CircMaze.Ring = function(maze, nr, radius) {
+CircMaze.Ring = function(maze, nr, radius, numCells) {
     this._maze = maze;
     this._nr = nr;
     this._radius = radius;
 
-    var num = this.calculateNumCells(),
+    var num = numCells || this.calculateNumCells(),
         arc = 2 * Math.PI / num,
         neighbourRing = (nr === 0 ? null : maze._rings[nr - 1]),
         lastId = (neighbourRing === null ? 0 : neighbourRing._cells[neighbourRing._cells.length - 1].getId() + 1);
