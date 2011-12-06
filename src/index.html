@@ -8,7 +8,6 @@
         <script src="prim.js"></script>
         <script src="krushkal.js"></script>
         <script>
-            var interval;
             function drawMaze(canvas, maze) {
                 var ctx = canvas.getContext("2d");
             
@@ -26,28 +25,20 @@
             function createMazeAndCanvas(div, algorithm, radius) {
                 var canvas = div.getElementsByTagName('canvas')[0];
             
-                maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 5, 30);
-                maze.eachCell(function(c) {
-                    var str = c.toString() + ': ';
-                    var i = 0;
-                    c.getAllNeighbours().forEach(function(n) {
-                        if (i++ > 0) {
-                            str += ', ';
-                        }
-                        str += n.toString();
-                    });
-                    console.log(str);
-                });
+                maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 80, 5);
+                //maze._rings[maze._rings.length - 5]._cells.forEach(function(cell) {
+                //    var neighbours = cell.getAllNeighbours();
+                //    console.log(cell.toString() + "->" + neighbours[0].toString() + ": " + cell.wallIsMine(neighbours[0]));
+                //    console.log(cell.toString() + "->" + neighbours[1].toString() + ": " + cell.wallIsMine(neighbours[1]));
+                //});
             
                 var headline = document.createElement('h3');
                 headline.appendChild(document.createTextNode(algorithm.name));
             
-                //canvas.setAttribute('width', "" + div.offsetWidth);
-                //canvas.setAttribute('height', "" + div.offsetHeight);
             
                 div.appendChild(headline);
                 //div.appendChild(canvas);
-                //algorithm.initialize(maze);
+                algorithm.initialize(maze);
             
 
                 return {
@@ -69,34 +60,33 @@
             function startMaze() {
                 var objs = [
                     //createMazeAndCanvas(document.getElementById("prim"), new PrimMazeGenerator(), 10),
-                    createMazeAndCanvas(document.getElementById("krushkal"), new KrushkalMazeGenerator(), 10)
+                    createMazeAndCanvas(document.getElementById("krushkal"), new DFSMazeGenerator(), 10)
                     //createMazeAndCanvas(document.getElementById("dfs"), new DFSMazeGenerator(), 10)
                 ];
                 objs.forEach(function(o) {
                     drawMaze(o.canvas, o.maze);
                 });
 
-                //var interval = undefined;
+                var interval = undefined;
 
-                //var nextStep = function() {
-                //    var madeStep = false;
-                //    var stepsToDo = 5;
-                //    for (var i = 0; madeStep === false && i < objs.length; i++) {
-                //        var obj = objs[i];
-                //        for (var j = 0; j < stepsToDo && obj.algorithm.step(); j++) {
-                //            madeStep = true;
-                //        }
-                //        if (madeStep) {
-                //            drawMaze(obj.canvas, obj.maze);
-                //        }
-                //    }
-                //    if (!madeStep) {
-                //        clearInterval(interval);
-                //        alert("Done");
-                //    }
-                //};
+                var nextStep = function() {
+                    var madeStep = false;
+                    var stepsToDo = 100;
+                    for (var i = 0; madeStep === false && i < objs.length; i++) {
+                        var obj = objs[i];
+                        for (var j = 0; j < stepsToDo && obj.algorithm.step(); j++) {
+                            madeStep = true;
+                        }
+                        if (madeStep) {
+                            drawMaze(obj.canvas, obj.maze);
+                        }
+                    }
+                    if (!madeStep) {
+                        clearInterval(interval);
+                    }
+                };
 
-                //interval = setInterval(nextStep, 50);
+                interval = setInterval(nextStep, 50);
             }
         </script>
         <style>
@@ -110,7 +100,7 @@
     </head>
     <body onLoad="startMaze();">
         <!--div class="maze" id="prim"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div-->
-        <div class="maze" id="krushkal"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div>
+        <div class="maze" id="krushkal"><canvas width="1200px" height="1200px" class="mazeCanvas"></canvas></div>
         <!--div class="maze" id="dfs"><canvas width="460px" height="600px" class="mazeCanvas"></canvas></div-->
     </body>
 </html>
