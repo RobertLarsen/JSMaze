@@ -7,6 +7,9 @@ var CircMaze = function(x, y, diameter, rings, minCellCircumference) {
     for (var i = 0; i < rings; i++) {
         this._rings.push(new CircMaze.Ring(this, i, diameter / 2 / rings * (i + 1)));
     }
+    this.eachCell(function(c) {
+        c.initializeWalls();
+    });
 };
 
 CircMaze.prototype = new Maze();
@@ -41,7 +44,6 @@ CircMaze.Cell.prototype.getId = function() {
 };
 
 CircMaze.Cell.prototype.paint = function(context) {
-    this.initializeWalls();
     this.getAllNeighbours().forEach(function(n) {
         if (this.wallIsMine(n) && this._walls["w" + n.getId()] === true) {
             this.paintWallTo(context, n);
@@ -104,7 +106,7 @@ CircMaze.Cell.prototype.paintWallTo = function(context, neighbour) {
 CircMaze.Cell.prototype.wallIsMine = function(neighbour) {
     var anglesEqual = function(a1, a2) {
         var diff = Math.abs(a1 - a2);
-        return diff < 0.00001 || (diff - Math.PI) < 0.00001;
+        return diff < 0.00001 || (diff - Math.PI * 2) < 0.00001;
     };
     var result = this._ring._nr === (neighbour._ring._nr - 1) ||
            (this._ring === neighbour._ring &&
@@ -125,7 +127,6 @@ CircMaze.Cell.prototype.initializeWalls = function() {
 }
 
 CircMaze.Cell.prototype.hasWallTo = function(neighbour) {
-    this.initializeWalls();
     if (this.wallIsMine(neighbour)) {
         return this._walls['w' + neighbour.getId()];
     } else {
