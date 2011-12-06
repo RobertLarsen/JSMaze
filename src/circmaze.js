@@ -47,6 +47,22 @@ CircMaze.Cell.prototype.paint = function(context) {
             this.paintWallTo(context, n);
         }
     }, this);
+
+    if (this._ring === this._ring._maze._rings[this._ring._maze._rings.length - 1]) {
+        context.save();
+        context.beginPath();
+
+        var x1 = this._ring._maze._x + Math.cos(this._startAngle) * this._ring._radius;
+        var y1 = this._ring._maze._x + Math.sin(this._startAngle) * this._ring._radius;
+        var x2 = this._ring._maze._x + Math.cos(this._endAngle) * this._ring._radius;
+        var y2 = this._ring._maze._x + Math.sin(this._endAngle) * this._ring._radius;
+
+        context.moveTo(x1, y1);
+        context.lineTo(x2, y2);
+
+        context.stroke();
+        context.restore();
+    }
 };
 
 CircMaze.Cell.prototype.paintWallTo = function(context, neighbour) {
