@@ -24,6 +24,9 @@ CircMaze.Cell = function(id, ring, idx, startAngle, endAngle) {
     this._startAngle = startAngle;
     this._endAngle = endAngle;
     this._neighbours = [];
+    this._walls = {
+        'length' : 0
+    };
 };
 
 CircMaze.Cell.prototype.toString = function() {
@@ -38,21 +41,107 @@ CircMaze.Cell.prototype.getId = function() {
 };
 
 CircMaze.Cell.prototype.paint = function(context) {
+    this.initializeWalls();
+    this.getAllNeighbours().forEach(function(n) {
+        if (this.wallIsMine(n) && this._walls["w" + n.getId()] === true) {
+            this.paintWallTo(context, n);
+        }
+    }, this);
+};
+
+CircMaze.Cell.prototype.paintWallTo = function(context, neighbour) {
+    var randomColor = function() {
+        var hex = "0123456789abcdef";
+        return hex.charAt(Math.floor(Math.random() * 16)) + 
+               hex.charAt(Math.floor(Math.random() * 16)) +
+               hex.charAt(Math.floor(Math.random() * 16));
+    };
+
     context.save();
-    context.moveTo(this._ring._maze._x + this._ring._radius * Math.cos(this._startAngle), this._ring._maze._y + this._ring._radius * Math.sin(this._startAngle));
-    context.lineTo(this._ring._maze._x + this._ring._radius * Math.cos(this._endAngle), this._ring._maze._y + this._ring._radius * Math.sin(this._endAngle));
+    context.beginPath();
+
+    var x1, y1, x2, y2;
+
+    if (neighbour._ring === this._ring) {
+        var innerRadius = (this._ring._nr === 0 ? 0 : this._ring._maze._rings[this._ring._nr - 1]._radius);
+        var outerRadius = this._ring._radius;
+        x1 = this._ring._maze._x + Math.cos(this._endAngle) * innerRadius;
+        y1 = this._ring._maze._x + Math.sin(this._endAngle) * innerRadius;
+        x2 = this._ring._maze._x + Math.cos(this._endAngle) * outerRadius;
+        y2 = this._ring._maze._x + Math.sin(this._endAngle) * outerRadius;
+    } else {
+        var start = Math.max(this._startAngle, neighbour._startAngle);
+        var end   = Math.min(this._endAngle, neighbour._endAngle);
+        x1 = this._ring._maze._x + Math.cos(start) * this._ring._radius;
+        y1 = this._ring._maze._x + Math.sin(start) * this._ring._radius;
+        x2 = this._ring._maze._x + Math.cos(end) * this._ring._radius;
+        y2 = this._ring._maze._x + Math.sin(end) * this._ring._radius;
+    }
+
+    context.moveTo(x1, y1);
+    context.lineTo(x2, y2);
+
     context.stroke();
     context.restore();
 };
 
-CircMaze.Cell.prototype.hasAllWalls = function() { };
-CircMaze.Cell.prototype.breakWallTo = function(neighbour) { };
+CircMaze.Cell.prototype.wallIsMine = function(neighbour) {
+    var anglesEqual = function(a1, a2) {
+        var diff = Math.abs(a1 - a2);
+        return diff < 0.00001 || (diff - Math.PI) < 0.00001;
+    };
+    var result = this._ring._nr === (neighbour._ring._nr - 1) ||
+           (this._ring === neighbour._ring &&
+            anglesEqual(this._endAngle, neighbour._startAngle));
+
+    return result;
+};
+
+CircMaze.Cell.prototype.initializeWalls = function() {
+    if (this._walls.length === 0) {
+        this.getAllNeighbours().forEach(function(n) {
+            if (this.wallIsMine(n)) {
+                this._walls['w' + n.getId()] = true;
+                this._walls['length']++;
+            }
+        }, this);
+    }
+}
+
+CircMaze.Cell.prototype.hasWallTo = function(neighbour) {
+    this.initializeWalls();
+    if (this.wallIsMine(neighbour)) {
+        return this._walls['w' + neighbour.getId()];
+    } else {
+        return neighbour.hasWallTo(this);
+    }
+};
+
+CircMaze.Cell.prototype.hasAllWalls = function() {
+    var hasAll = true;
+    this.getAllNeighbours().forEach(function(n) {
+        if (this.hasWallTo(n) === false) {
+            hasAll = false;
+        }
+    }, this);
+    return hasAll;
+};
+
+CircMaze.Cell.prototype.breakWallTo = function(neighbour) {
+    if (this.wallIsMine(neighbour)) {
+        this._walls['w' + neighbour.getId()] = false;
+    } else {
+        return neighbour.breakWallTo(this);
+    }
+};
 
 CircMaze.Cell.prototype.getAllNeighbours = function() {
     if (this._neighbours.length === 0) {
-        var n = this._ring._cells.length;
-        this._neighbours.push(this._ring._cells[(this._idx + 1) % n]);
-        this._neighbours.push(this._ring._cells[(this._idx + n - 1) % n]);
+        if (this._ring._nr > 0) {
+            var n = this._ring._cells.length;
+            this._neighbours.push(this._ring._cells[(this._idx + 1) % n]);
+            this._neighbours.push(this._ring._cells[(this._idx + n - 1) % n]);
+        }
         if (this._ring._nr > 0) {
             this._neighbours = this._neighbours.concat(this._ring._maze._rings[this._ring._nr - 1].getCellsInArc(this._startAngle, this._endAngle));
         }
