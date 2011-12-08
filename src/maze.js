@@ -54,3 +54,9 @@ Maze.Cell.prototype.paint = function(context) { };
 Maze.Cell.prototype.hasAllWalls = function() { };
 Maze.Cell.prototype.breakWallTo = function(neighbour) { };
 Maze.Cell.prototype.getAllNeighbours = function() { };
+Maze.Cell.prototype.canEnter = function(neighbour) { };
+Maze.Cell.prototype.getReachableNeighbours = function() {
+    return this.getAllNeighbours().filter(function(n) {
+        return this.canEnter(n);
+    }, this);
+};

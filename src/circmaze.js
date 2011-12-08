@@ -33,6 +33,7 @@ CircMaze.Cell = function(id, ring, idx, startAngle, endAngle) {
         'length' : 0
     };
 };
+CircMaze.Cell.prototype = new Maze.Cell();
 
 CircMaze.Cell.prototype.toString = function() {
     var toD = function(r) {
@@ -143,6 +144,10 @@ CircMaze.Cell.prototype.hasWallTo = function(neighbour) {
     }
 };
 
+CircMaze.Cell.prototype.canEnter = function(neighbour) {
+    return !this.hasWallTo(neighbour);
+};
+
 CircMaze.Cell.prototype.hasAllWalls = function() {
     var hasAll = true;
     this.getAllNeighbours().forEach(function(n) {
@@ -152,6 +157,8 @@ CircMaze.Cell.prototype.hasAllWalls = function() {
     }, this);
     return hasAll;
 };
+
+
 
 CircMaze.Cell.prototype.breakWallTo = function(neighbour) {
     if (this.wallIsMine(neighbour)) {

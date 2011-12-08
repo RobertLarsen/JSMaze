@@ -171,6 +171,11 @@ HexMaze.Cell.prototype.getNeighbourDirection = function(neighbour) {
     }
 };
 
+HexMaze.Cell.prototype.canEnter = function(neighbour) {
+    var direction = this.getNeighbourDirection(neighbour);
+    return this.hasWall(direction);
+};
+
 HexMaze.Cell.prototype.hasNorth = function() {
     var north = this.getNeighbour(HexMaze.Cell.NORTH);
     return north ? north.hasSouth() : true;
