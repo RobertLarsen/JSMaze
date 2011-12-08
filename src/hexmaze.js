@@ -173,7 +173,7 @@ HexMaze.Cell.prototype.getNeighbourDirection = function(neighbour) {
 
 HexMaze.Cell.prototype.canEnter = function(neighbour) {
     var direction = this.getNeighbourDirection(neighbour);
-    return this.hasWall(direction);
+    return !this.hasWall(direction);
 };
 
 HexMaze.Cell.prototype.hasNorth = function() {

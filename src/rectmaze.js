@@ -99,7 +99,7 @@ RectMaze.Cell.prototype.getNeighbourDirection = function(neighbour) {
 
 RectMaze.Cell.prototype.canEnter = function(neighbour) {
     var direction = this.getNeighbourDirection(neighbour);
-    return this.hasWall(direction);
+    return !this.hasWall(direction);
 };
 
 RectMaze.Cell.prototype.getAllNeighbours = function() {
