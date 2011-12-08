@@ -4,6 +4,8 @@
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <script src="maze.js"></script>
         <script src="circmaze.js"></script>
+        <script src="hexmaze.js"></script>
+        <script src="rectmaze.js"></script>
         <script src="generator.js"></script>
         <script src="dfs.js"></script>
         <script src="prim.js"></script>
@@ -29,28 +31,16 @@
             function createMazeAndCanvas(div, algorithm, radius) {
                 var canvas = div.getElementsByTagName('canvas')[0];
             
-                //maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 140, 3);
                 maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 20, 30);
-                //maze._rings[maze._rings.length - 5]._cells.forEach(function(cell) {
-                //    var neighbours = cell.getAllNeighbours();
-                //    console.log(cell.toString() + "->" + neighbours[0].toString() + ": " + cell.wallIsMine(neighbours[0]));
-                //    console.log(cell.toString() + "->" + neighbours[1].toString() + ": " + cell.wallIsMine(neighbours[1]));
-                //});
+                //maze = new HexMaze(45, 13, 30);
+                //maze = new RectMaze(40, 40, 30, 30);
             
-                var headline = document.createElement('h3');
-                headline.appendChild(document.createTextNode(algorithm.name));
-            
-            
-                div.appendChild(headline);
-                //div.appendChild(canvas);
                 algorithm.initialize(maze);
-            
 
                 return {
                     'div' : div,
                     'canvas' : canvas,
                     'maze' : maze,
-                    'headline' : headline,
                     'radius' : radius,
                     'algorithm' : algorithm
                 };
@@ -80,8 +70,14 @@
 
                         clearInterval(interval);
                         var solver = new SimpleSolver();
-                        var first = maze._rings[maze._rings.length - 1]._cells[0];
-                        var last = maze._rings[0]._cells[0];
+                        var first = null;
+                        var last = null;
+                        maze.eachCell(function(c) {
+                            if (first === null) {
+                                first = c;
+                            }
+                            last = c;
+                        });
                         var solution = solver.generate(maze, first, last);
 
                         var ctx = o.canvas.getContext("2d");
@@ -90,7 +86,7 @@
                         solver.paint(ctx);
 
                         var steganograpy = new Steganography();
-                        steganograpy.initialize("abcdefghijklmnopqrstuvwxyzæøå ", maze, solution, "så bliver labyrinter vist heller ikke svedigerere");
+                        steganograpy.initialize("abcdefghijklmnopqrstuvwxyzæøå ", maze, solution, "labyrinths are so cool and versatile");
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.font = 'italic 400 20px/2 Unknown Font, sans-serif';
