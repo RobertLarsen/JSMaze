@@ -68,6 +68,16 @@ HexMaze.Cell.NORTH_WEST = 3;
 HexMaze.Cell.NORTH      = 4;
 HexMaze.Cell.NORTH_EAST = 5;
 
+HexMaze.Cell.prototype.getCenter = function() {
+    var r = this.maze.getCellRadius();
+    var halfHeight = HexMaze.SIN_TABLE[1] * r;
+
+    var x = (this.row % 2 === 0) ? (3 * r) * this.col + r : 2 * r * (this.col + 1) + (r / 2) * (this.col * 2 + 1);
+    var y = (this.row + 1) * halfHeight;
+
+    return { 'y' : y, 'x' : x };
+};
+
 HexMaze.Cell.prototype.paint = function(context) {
     var r = this.maze.getCellRadius();
     var halfHeight = HexMaze.SIN_TABLE[1] * r;

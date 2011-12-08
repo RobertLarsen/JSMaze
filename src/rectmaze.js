@@ -137,6 +137,14 @@ RectMaze.Cell.prototype.breakWallTo = function(neighbour) {
     this.breakWall(direction);
 };
 
+RectMaze.Cell.prototype.getCenter = function() {
+    var w = this._maze._cellWidth,
+        h = this._maze._cellHeight,
+        x = this._col * w,
+        y = this._row * h;
+    return { 'x' : x + w / 2, 'y' : y + h / 2 };
+};
+
 RectMaze.Cell.prototype.paint = function(context) {
     var w = this._maze._cellWidth;
     var h = this._maze._cellHeight;

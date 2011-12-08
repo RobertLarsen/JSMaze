@@ -49,6 +49,7 @@ Maze.prototype.paint = function(context) {
 
 Maze.Cell = function() { };
 Maze.Cell.prototype.getId = function() { };
+Maze.Cell.prototype.getCenter = function() { };
 Maze.Cell.prototype.paint = function(context) { };
 Maze.Cell.prototype.hasAllWalls = function() { };
 Maze.Cell.prototype.breakWallTo = function(neighbour) { };

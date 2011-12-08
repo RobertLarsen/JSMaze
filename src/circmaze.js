@@ -45,6 +45,13 @@ CircMaze.Cell.prototype.getId = function() {
     return this._id;
 };
 
+CircMaze.Cell.prototype.getCenter = function() {
+    var a = (this._startAngle + this._endAngle) / 2,
+        rDiff = this._ring._radius / (this._ring._nr + 1),
+        r = this._ring._radius - rDiff / 2;
+    return { 'x' : this._ring._maze._x + Math.cos(a) * r, 'y' : this._ring._maze._y + Math.sin(a) * r };
+};
+
 CircMaze.Cell.prototype.paint = function(context) {
     this.getAllNeighbours().forEach(function(n) {
         if (this.wallIsMine(n) && this._walls["w" + n.getId()] === true) {
