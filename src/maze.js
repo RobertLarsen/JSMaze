@@ -51,6 +51,23 @@ Maze.Cell = function() { };
 Maze.Cell.prototype.getId = function() { };
 Maze.Cell.prototype.getCenter = function() { };
 Maze.Cell.prototype.paint = function(context) { };
+Maze.Cell.prototype.paintPathThrough = function(context, fromCell, toCell) {
+    var c = this.getCenter();
+    if (fromCell !== null) {
+        var f = fromCell.getCenter();
+        context.beginPath();
+        context.moveTo(f.x, f.y);
+        context.lineTo(c.x, c.y);
+        context.stroke();
+    }
+    if (toCell !== null) {
+        var f = toCell.getCenter();
+        context.beginPath();
+        context.moveTo(f.x, f.y);
+        context.lineTo(c.x, c.y);
+        context.stroke();
+    }
+};
 Maze.Cell.prototype.hasAllWalls = function() { };
 Maze.Cell.prototype.breakWallTo = function(neighbour) { };
 Maze.Cell.prototype.getAllNeighbours = function() { };
