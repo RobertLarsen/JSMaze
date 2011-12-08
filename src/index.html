@@ -1,12 +1,16 @@
 <!doctype html>
 <html>
     <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <script src="maze.js"></script>
         <script src="circmaze.js"></script>
         <script src="generator.js"></script>
         <script src="dfs.js"></script>
         <script src="prim.js"></script>
         <script src="krushkal.js"></script>
+        <script src="solver.js"></script>
+        <script src="simplesolver.js"></script>
+        <script src="steganography.js"></script>
         <script>
             function drawMaze(canvas, maze) {
                 var ctx = canvas.getContext("2d");
@@ -25,7 +29,8 @@
             function createMazeAndCanvas(div, algorithm, radius) {
                 var canvas = div.getElementsByTagName('canvas')[0];
             
-                maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 80, 5);
+                //maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 140, 3);
+                maze = new CircMaze(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) - 4, 20, 30);
                 //maze._rings[maze._rings.length - 5]._cells.forEach(function(cell) {
                 //    var neighbours = cell.getAllNeighbours();
                 //    console.log(cell.toString() + "->" + neighbours[0].toString() + ": " + cell.wallIsMine(neighbours[0]));
@@ -58,31 +63,38 @@
             }
 
             function startMaze() {
-                var objs = [
-                    //createMazeAndCanvas(document.getElementById("prim"), new PrimMazeGenerator(), 10),
-                    createMazeAndCanvas(document.getElementById("krushkal"), new DFSMazeGenerator(), 10)
-                    //createMazeAndCanvas(document.getElementById("dfs"), new DFSMazeGenerator(), 10)
-                ];
-                objs.forEach(function(o) {
-                    drawMaze(o.canvas, o.maze);
-                });
+                var o = createMazeAndCanvas(document.getElementById("krushkal"), new DFSMazeGenerator(), 10);
+                drawMaze(o.canvas, o.maze);
 
                 var interval = undefined;
 
                 var nextStep = function() {
                     var madeStep = false;
-                    var stepsToDo = 100;
-                    for (var i = 0; madeStep === false && i < objs.length; i++) {
-                        var obj = objs[i];
-                        for (var j = 0; j < stepsToDo && obj.algorithm.step(); j++) {
+                    var stepsToDo = 10000;
+                    for (var j = 0; j < stepsToDo && o.algorithm.step(); j++) {
                             madeStep = true;
-                        }
-                        if (madeStep) {
-                            drawMaze(obj.canvas, obj.maze);
-                        }
                     }
-                    if (!madeStep) {
+                    if (madeStep) {
+                        drawMaze(o.canvas, o.maze);
+                    } else {
+
                         clearInterval(interval);
+                        var solver = new SimpleSolver();
+                        var first = maze._rings[maze._rings.length - 1]._cells[0];
+                        var last = maze._rings[0]._cells[0];
+                        var solution = solver.generate(maze, first, last);
+
+                        var ctx = o.canvas.getContext("2d");
+                        ctx.strokeStyle = '#f00';
+
+                        solver.paint(ctx);
+
+                        var steganograpy = new Steganography();
+                        steganograpy.initialize("abcdefghijklmnopqrstuvwxyzæøå ", maze, solution, "så bliver labyrinter vist heller ikke svedigerere");
+                        ctx.textAlign = 'middle';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = 'italic 400 20px/2 Unknown Font, sans-serif';
+                        steganograpy.paint(ctx);
                     }
                 };
 
