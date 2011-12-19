@@ -47,10 +47,19 @@ CircMaze.Cell.prototype.getId = function() {
 };
 
 CircMaze.Cell.prototype.getCenter = function() {
-    var a = (this._startAngle + this._endAngle) / 2,
-        rDiff = this._ring._radius / (this._ring._nr + 1),
-        r = this._ring._radius - rDiff / 2;
-    return { 'x' : this._ring._maze._x + Math.cos(a) * r, 'y' : this._ring._maze._y + Math.sin(a) * r };
+    var center = null;
+    if (this._ring._nr === 0) {
+        center = {
+            'x' : this._ring._maze._x,
+            'y' : this._ring._maze._y
+        };
+    } else {
+        var a = (this._startAngle + this._endAngle) / 2,
+            rDiff = this._ring._radius / (this._ring._nr + 1),
+            r = this._ring._radius - rDiff / 2;
+        center = { 'x' : this._ring._maze._x + Math.cos(a) * r, 'y' : this._ring._maze._y + Math.sin(a) * r };
+    }
+    return center;
 };
 
 CircMaze.Cell.prototype.paint = function(context) {
