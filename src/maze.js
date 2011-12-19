@@ -48,6 +48,7 @@ Maze.prototype.paint = function(context) {
 };
 
 Maze.Cell = function() { };
+Maze.Cell.prototype.setPath = function(context) { };
 Maze.Cell.prototype.getId = function() { };
 Maze.Cell.prototype.getCenter = function() { };
 Maze.Cell.prototype.paint = function(context) { };

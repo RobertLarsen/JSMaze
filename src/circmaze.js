@@ -35,6 +35,34 @@ CircMaze.Cell = function(id, ring, idx, startAngle, endAngle) {
 };
 CircMaze.Cell.prototype = new Maze.Cell();
 
+CircMaze.Cell.prototype.setPath = function(context) {
+    var r = this._ring._radius,
+        x = this._ring._maze._x,
+        y = this._ring._maze._y;
+    context.beginPath();
+    context.moveTo(x + Math.cos(this._startAngle) * r, y + Math.sin(this._startAngle) * r);
+    
+    //All outer neighbours
+    if (this._ring !== this._ring._maze._rings[this._ring._maze._rings.length - 1]) {
+        //There are outer neighbours
+        this._ring._maze._rings[this._ring._nr + 1].getCellsInArc(this._startAngle, this._endAngle).forEach(function(n) {
+            if (n._startAngle > this._startAngle && n._startAngle < this._endAngle) {
+                context.lineTo(x + Math.cos(n._startAngle) * r, y + Math.sin(n._startAngle) * r);
+            }
+        }, this);
+    }
+
+    context.lineTo(x + Math.cos(this._endAngle) * r, y + Math.sin(this._endAngle) * r);
+
+    if (this._ring._nr > 0) {
+        r = this._ring._maze._rings[this._ring._nr - 1]._radius;
+        context.lineTo(x + Math.cos(this._endAngle) * r, y + Math.sin(this._endAngle) * r);
+        context.lineTo(x + Math.cos(this._startAngle) * r, y + Math.sin(this._startAngle) * r);
+    }
+
+    context.closePath();
+};
+
 CircMaze.Cell.prototype.toString = function() {
     var toD = function(r) {
         return r / Math.PI * 180;
