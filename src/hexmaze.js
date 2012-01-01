@@ -35,7 +35,7 @@ HexMaze.SIN_TABLE = [
 
 HexMaze.prototype.getDimension = function() {
     var halfHeight = HexMaze.SIN_TABLE[1] * this.radius;
-    return {'width': this.cols * this.radius + 1, 'height': this.rows * halfHeight + halfHeight + 1};
+    return {'width': (this.cols * 3 - 1) * this.radius, 'height': this.rows * halfHeight + halfHeight + 1};
 };
 
 HexMaze.prototype.getCellRadius = function() {
