@@ -12,6 +12,10 @@ var RectMaze = function(rows, cols, cellWidth, cellHeight) {
 };
 RectMaze.prototype = new Maze();
 
+RectMaze.prototype.getDimension = function() {
+    return {'width': this._cols * this._cellWidth + 1, 'height': this._rows * this._cellHeight + 1};
+};
+
 RectMaze.prototype.eachCell = function(callback, obj) {
     this._cells.forEach(callback, obj);
 };

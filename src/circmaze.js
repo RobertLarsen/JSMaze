@@ -16,6 +16,10 @@ var CircMaze = function(x, y, diameter, rings, minCellCircumference) {
 
 CircMaze.prototype = new Maze();
 
+CircMaze.prototype.getDimension = function() {
+    return {'width': this._diameter + 2, 'height': this._diameter + 2};
+};
+
 CircMaze.prototype.eachCell = function(callback, obj) {
     this._rings.forEach(function(ring) {
         ring._cells.forEach(callback, obj);

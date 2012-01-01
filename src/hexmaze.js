@@ -33,6 +33,11 @@ HexMaze.SIN_TABLE = [
     Math.sin(HexMaze.PI2_6 * 6)
 ];
 
+HexMaze.prototype.getDimension = function() {
+    var halfHeight = HexMaze.SIN_TABLE[1] * this.radius;
+    return {'width': this.cols * this.radius + 1, 'height': this.rows * halfHeight + halfHeight + 1};
+};
+
 HexMaze.prototype.getCellRadius = function() {
     return this.radius;
 };

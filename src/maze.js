@@ -41,6 +41,7 @@ if (!Array.prototype.forEach) {
 var Maze = function() { };
 
 Maze.prototype.eachCell = function(callback, obj) { };
+Maze.prototype.getDimension = function() { }
 Maze.prototype.paint = function(context) {
     this.eachCell(function(cell) {
         cell.paint(context);
