@@ -49,32 +49,39 @@
                 };
 
                 //Maze style
+                var createMaze = function() {
+                    var maze = null;
+                    var name = $('.maze_style_select').find('option:selected').text();
+                    switch (name) {
+                        case 'Rectangular':
+                            var w = parseInt($('#Rectangular').find('input:eq(0)').val()),
+                                h = parseInt($('#Rectangular').find('input:eq(1)').val()),
+                                r = parseInt($('#Rectangular').find('input:eq(2)').val()),
+                                c = parseInt($('#Rectangular').find('input:eq(3)').val());
+                            maze = new RectMaze(r, c, w, h);
+                        break;
+                        case 'Hexagonal':
+                            var ra = parseInt($('#Hexagonal').find('input:eq(0)').val()),
+                                r  = parseInt($('#Hexagonal').find('input:eq(1)').val()),
+                                c  = parseInt($('#Hexagonal').find('input:eq(2)').val());
+                            maze = new HexMaze(r, c, ra);
+                        break;
+                        case 'Circular':
+                            var d = parseInt($('#Circular').find('input:eq(0)').val()),
+                                r = parseInt($('#Circular').find('input:eq(1)').val()),
+                                c = parseInt($('#Circular').find('input:eq(2)').val());
+                            maze = new CircMaze(d/2, d/2, d, r, c);
+                        break;
+                    }
+                    return maze;
+                };
+
                 $('.maze_style_select').change(function() {
                     $('.mazestyle').hide();
                     $('#' + $(this).find('option:selected').text()).show();
                 });
-                $('#rect_create').click(function() {
-                    var w = parseInt($('#Rectangular').find('input:eq(0)').val()),
-                        h = parseInt($('#Rectangular').find('input:eq(1)').val()),
-                        r = parseInt($('#Rectangular').find('input:eq(2)').val()),
-                        c = parseInt($('#Rectangular').find('input:eq(3)').val());
-                    maze = new RectMaze(r, c, w, h);
-                    resizeCanvasAndPaint();
-                    return false;
-                });
-                $('#hex_create').click(function() {
-                    var ra = parseInt($('#Hexagonal').find('input:eq(0)').val()),
-                        r  = parseInt($('#Hexagonal').find('input:eq(1)').val()),
-                        c  = parseInt($('#Hexagonal').find('input:eq(2)').val());
-                    maze = new HexMaze(r, c, ra);
-                    resizeCanvasAndPaint();
-                    return false;
-                });
-                $('#circ_create').click(function() {
-                    var d = parseInt($('#Circular').find('input:eq(0)').val()),
-                        r = parseInt($('#Circular').find('input:eq(1)').val()),
-                        c = parseInt($('#Circular').find('input:eq(2)').val());
-                    maze = new CircMaze(d/2, d/2, d, r, c);
+                $('.create_maze').click(function() {
+                    maze = createMaze();
                     resizeCanvasAndPaint();
                     return false;
                 });
@@ -94,6 +101,8 @@
                 $('.algorithm_animate').click(function() {
                     var steps = parseInt($('#Algorithm').find('input:eq(0)').val()),
                         frames = parseInt($('#Algorithm').find('input:eq(1)').val());
+                    maze = createMaze();
+                    resizeCanvasAndPaint();
                     var algo = getAlgorithm();
                     algo.initialize(maze);
                     var interval = setInterval(function() {
@@ -111,6 +120,8 @@
                     return false;
                 });
                 $('.algorithm_finish').click(function() {
+                    getAlgorithm().generate(maze = createMaze());
+                    resizeCanvasAndPaint();
                     return false;
                 });
             });
@@ -146,7 +157,7 @@
                             <td><input type="text" value="50"/></td>
                         </tr>
                         <tr>
-                            <td colspan="2"><button id="rect_create">Create grid</button></td>
+                            <td colspan="2"><button class="create_maze">Create grid</button></td>
                         </tr>
                     </table>
                 </form>
@@ -168,7 +179,7 @@
                             <td><input type="text" value="20"/></td>
                         </tr>
                         <tr>
-                            <td colspan="2"><button id="hex_create">Create grid</button></td>
+                            <td colspan="2"><button class="create_maze">Create grid</button></td>
                         </tr>
                     </table>
                 </form>
@@ -190,7 +201,7 @@
                             <td><input type="text" value="10"/></td>
                         </tr>
                         <tr>
-                            <td colspan="2"><button id="circ_create">Create grid</button></td>
+                            <td colspan="2"><button class="create_maze">Create grid</button></td>
                         </tr>
                     </table>
                 </form>
