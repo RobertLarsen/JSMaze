@@ -40,6 +40,20 @@ RectMaze.Cell.SOUTH =  1;
 RectMaze.Cell.WEST  =  2;
 RectMaze.Cell.NORTH =  3;
 
+RectMaze.Cell.prototype.setPath = function(context) {
+    var w = this._maze._cellWidth,
+        h = this._maze._cellHeight,
+        x = this._col * w,
+        y = this._row * h;
+
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x + w, y);
+    context.lineTo(x + w, y + h);
+    context.lineTo(x, y + h);
+    context.closePath();
+};
+
 RectMaze.Cell.prototype.getId = function() {
     return this._row * this._maze._cols + this._col;
 };
