@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <style>
+            canvas {
+                border: 1px solid black;
+            }
+        </style>
+        <script src="maze.js"></script>
+        <script src="circmaze.js"></script>
+        <script src="hexmaze.js"></script>
+        <script src="rectmaze.js"></script>
+        <script src="generator.js"></script>
+        <script src="dfs.js"></script>
+        <script src="prim.js"></script>
+        <script src="krushkal.js"></script>
+        <script src="solver.js"></script>
+        <script src="simplesolver.js"></script>
+        <script src="steganography.js"></script>
+
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+        <script>
+            $(function() {
+                $('canvas').click(function() {
+                    window.open(this.toDataURL('image/png'), '_blank');
+                });
+
+                var maze = null;
+                var algorithm = null;
+
+                var drawMaze = function(ctx) {
+                    var dimension = maze.getDimension();
+                    ctx.clearRect(0,0,dimension.width,dimension.height);
+                    ctx.strokeStyle = '#000';
+                    maze.paint(ctx);
+                };
+
+                var resizeCanvasAndPaint = function() {
+                    $('canvas').each(function() {
+                        var dimension = maze.getDimension();
+                        this.width = dimension.width;
+                        this.height = dimension.height;
+
+                        var ctx = this.getContext("2d");
+                        drawMaze(ctx);
+                    });
+                };
+
+                //Maze style
+                $('.maze_style_select').change(function() {
+                    $('.mazestyle').hide();
+                    $('#' + $(this).find('option:selected').text()).show();
+                });
+                $('#rect_create').click(function() {
+                    var w = parseInt($('#Rectangular').find('input:eq(0)').val()),
+                        h = parseInt($('#Rectangular').find('input:eq(1)').val()),
+                        r = parseInt($('#Rectangular').find('input:eq(2)').val()),
+                        c = parseInt($('#Rectangular').find('input:eq(3)').val());
+                    maze = new RectMaze(r, c, w, h);
+                    resizeCanvasAndPaint();
+                    return false;
+                });
+                $('#hex_create').click(function() {
+                    var ra = parseInt($('#Hexagonal').find('input:eq(0)').val()),
+                        r  = parseInt($('#Hexagonal').find('input:eq(1)').val()),
+                        c  = parseInt($('#Hexagonal').find('input:eq(2)').val());
+                    maze = new HexMaze(r, c, ra);
+                    resizeCanvasAndPaint();
+                    return false;
+                });
+                $('#circ_create').click(function() {
+                    var d = parseInt($('#Circular').find('input:eq(0)').val()),
+                        r = parseInt($('#Circular').find('input:eq(1)').val()),
+                        c = parseInt($('#Circular').find('input:eq(2)').val());
+                    maze = new CircMaze(d/2, d/2, d, r, c);
+                    resizeCanvasAndPaint();
+                    return false;
+                });
+
+                //Maze generation
+                var getAlgorithm = function() {
+                    var algo = null;
+                    var name = $('.algorithm_selector').find('option:selected').text();
+                    switch (name) {
+                        case 'DFS' : algo = new DFSMazeGenerator(); break; 
+                        case 'Prim' : algo = new PrimMazeGenerator(); break; 
+                        case 'Krushkal' : algo = new KrushkalMazeGenerator(); break; 
+                    }
+                    return algo;
+                };
+
+                $('.algorithm_animate').click(function() {
+                    var steps = parseInt($('#Algorithm').find('input:eq(0)').val()),
+                        frames = parseInt($('#Algorithm').find('input:eq(1)').val());
+                    var algo = getAlgorithm();
+                    algo.initialize(maze);
+                    var interval = setInterval(function() {
+                        var again = true;
+                        for (var i = 0; i < steps && again; i++) {
+                            again = algo.step();
+                        }
+                        if (again === false) {
+                            clearInterval(interval);
+                        }
+                        $('canvas').each(function() {
+                            drawMaze(this.getContext('2d'));
+                        });
+                    }, 1000 / frames);
+                    return false;
+                });
+                $('.algorithm_finish').click(function() {
+                    return false;
+                });
+            });
+        </script>
+        <style>
+            input[type=text] {
+                width: 60px;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas></canvas>
+        <div>
+            Choose style: <select class='maze_style_select'><option>Rectangular</option><option>Hexagonal</option><option>Circular</option></select>
+            <fieldset class="mazestyle" id="Rectangular">
+                <legend>Rectangular style</legend>
+                <form>
+                    <table>
+                        <tr>
+                            <td>Cell width:</td>
+                            <td><input type="text" value="10"/></td>
+                        </tr>
+                        <tr>
+                            <td>Cell height:</td>
+                            <td><input type="text" value="10"/></td>
+                        </tr>
+                        <tr>
+                            <td>Rows:</td>
+                            <td><input type="text" value="50"/></td>
+                        </tr>
+                        <tr>
+                            <td>Columns:</td>
+                            <td><input type="text" value="50"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><button id="rect_create">Create grid</button></td>
+                        </tr>
+                    </table>
+                </form>
+            </fieldset>
+            <fieldset class="mazestyle" style="display: none" id="Hexagonal">
+                <legend>Hexagonal style</legend>
+                <form>
+                    <table>
+                        <tr>
+                            <td>Cell radius:</td>
+                            <td><input type="text" value="10"/></td>
+                        </tr>
+                        <tr>
+                            <td>Rows:</td>
+                            <td><input type="text" value="60"/></td>
+                        </tr>
+                        <tr>
+                            <td>Columns:</td>
+                            <td><input type="text" value="20"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><button id="hex_create">Create grid</button></td>
+                        </tr>
+                    </table>
+                </form>
+            </fieldset>
+            <fieldset class="mazestyle" style="display: none" id="Circular">
+                <legend>Circular style</legend>
+                <form>
+                    <table>
+                        <tr>
+                            <td>Diameter:</td>
+                            <td><input type="text" value="500"/></td>
+                        </tr>
+                        <tr>
+                            <td>Number of rings:</td>
+                            <td><input type="text" value="20"/></td>
+                        </tr>
+                        <tr>
+                            <td>Cell circumference:</td>
+                            <td><input type="text" value="10"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><button id="circ_create">Create grid</button></td>
+                        </tr>
+                    </table>
+                </form>
+            </fieldset>
+        </div>
+        <div>
+            <form id="Algorithm">
+                <table>
+                    <tr>
+                        <td>Choose algorithm:</td><td><select class="algorithm_selector"><option>DFS</option><option>Prim</option><option>Krushkal</option></select></td>
+                    </tr>
+                    <tr>
+                        <td>Steps per animation frame:</td><td><input type="text" value="50"/></td>
+                    </tr>
+                    <tr>
+                        <td>Frames per second:</td><td><input type="text" value="30"/></td>
+                    </tr>
+                    <tr>
+                        <td align="center" colspan="2"><button class="algorithm_animate">Animate</button><button class="algorithm_finish">Finish</button></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </body>
+</html>
