@@ -29,12 +29,38 @@
 
                 var maze = null;
                 var algorithm = null;
+                var solution = null;
+
+                var createSolution = function(solver, maze) {
+                    var first = null,
+                        last = null;
+                    maze.eachCell(function(c) {
+                        if (first === null) {
+                            first = c;
+                        }
+                        last = c;
+                    });
+                    return solver.generate(maze, first, last);
+                };
 
                 var drawMaze = function(ctx) {
                     var dimension = maze.getDimension();
                     ctx.clearRect(0,0,dimension.width,dimension.height);
                     ctx.strokeStyle = '#000';
                     maze.paint(ctx);
+
+                    if (solution) {
+                        ctx.strokeStyle = '#f00';
+                        var prev = null, cur = null, next = null;
+                        solution.forEach(function(c) {
+                            prev = cur;
+                            cur = next;
+                            next = c;
+                            if (cur) {
+                                cur.paintPathThrough(ctx, prev, next);
+                            }
+                        });
+                    }
                 };
 
                 var resizeCanvasAndPaint = function() {
@@ -50,6 +76,7 @@
 
                 //Maze style
                 var createMaze = function() {
+                    solution = null;
                     var maze = null;
                     var name = $('.maze_style_select').find('option:selected').text();
                     switch (name) {
@@ -112,6 +139,7 @@
                         }
                         if (again === false) {
                             clearInterval(interval);
+                            solution = createSolution(new SimpleSolver(), maze);
                         }
                         $('canvas').each(function() {
                             drawMaze(this.getContext('2d'));
@@ -121,6 +149,7 @@
                 });
                 $('.algorithm_finish').click(function() {
                     getAlgorithm().generate(maze = createMaze());
+                    solution = createSolution(new SimpleSolver(), maze);
                     resizeCanvasAndPaint();
                     return false;
                 });
@@ -223,6 +252,11 @@
                         <td align="center" colspan="2"><button class="algorithm_animate">Animate</button><button class="algorithm_finish">Finish</button></td>
                     </tr>
                 </table>
+            </form>
+        </div>
+        <div>
+            <form id="ShowSolution">
+                
             </form>
         </div>
     </body>
