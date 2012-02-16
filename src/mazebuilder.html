@@ -27,6 +27,14 @@
                     window.open(this.toDataURL('image/png'), '_blank');
                 });
 
+                $('#show_solution').change(function() {
+                    if (maze === null) {
+                        getAlgorithm().generate(maze = createMaze());
+                        solution = createSolution(new SimpleSolver(), maze);
+                    }
+                    resizeCanvasAndPaint();
+                });
+
                 var maze = null;
                 var algorithm = null;
                 var solution = null;
@@ -49,7 +57,7 @@
                     ctx.strokeStyle = '#000';
                     maze.paint(ctx);
 
-                    if (solution) {
+                    if (solution && $('#show_solution').attr('checked')) {
                         ctx.strokeStyle = '#f00';
                         var prev = null, cur = null, next = null;
                         solution.forEach(function(c) {
@@ -256,7 +264,7 @@
         </div>
         <div>
             <form id="ShowSolution">
-                
+                <input type="checkbox" id="show_solution" checked/> Show solution
             </form>
         </div>
     </body>
