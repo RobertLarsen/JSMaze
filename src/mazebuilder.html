@@ -88,10 +88,11 @@
                         for (i = 0; i < prependLength; i++) {
                             prepend += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
                         }
-                        steganography.initialize(alphabet, maze, solution, prepend + text);
+                        steganography.initialize(alphabet, maze, solution, prepend + text, 15);
                     }
 
                     if (steganography && $('#add_steganography').attr('checked')) {
+                        ctx.font = '18px arial';
                         steganography.paint(ctx);
                     }
                 };
