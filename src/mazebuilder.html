@@ -34,10 +34,19 @@
                     }
                     resizeCanvasAndPaint();
                 });
+                $('#add_steganography').change(function() {
+                    steganography = null;
+                    if (maze === null) {
+                        getAlgorithm().generate(maze = createMaze());
+                        solution = createSolution(new SimpleSolver(), maze);
+                    }
+                    resizeCanvasAndPaint();
+                });
 
                 var maze = null;
                 var algorithm = null;
                 var solution = null;
+                var steganography = null;
 
                 var createSolution = function(solver, maze) {
                     var first = null,
@@ -68,6 +77,22 @@
                                 cur.paintPathThrough(ctx, prev, next);
                             }
                         });
+                    }
+
+                    if (steganography === null && $('#add_steganography').attr('checked')) {
+                        steganography = new Steganography();
+                        var alphabet = $('#alphabet').val(),
+                            text = $('#stego_text').val(),
+                            prependLength = (solution.length - text.length) / 2,
+                            prepend = '', i;
+                        for (i = 0; i < prependLength; i++) {
+                            prepend += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+                        }
+                        steganography.initialize(alphabet, maze, solution, prepend + text);
+                    }
+
+                    if (steganography && $('#add_steganography').attr('checked')) {
+                        steganography.paint(ctx);
                     }
                 };
 
@@ -265,6 +290,24 @@
         <div>
             <form id="ShowSolution">
                 <input type="checkbox" id="show_solution" checked/> Show solution
+            </form>
+        </div>
+        <div>
+            <form id="Steganography">
+                <table>
+                    <tr>
+                        <td>Alphabet:</td>
+                        <td><input id="alphabet" value="abcdefghijklmnopqrstuvwxyzæøå "/></td>
+                    </tr>
+                    <tr>
+                        <td>Text:</td>
+                        <td><input id="stego_text" value="hello world"/></td>
+                    </tr>
+                    <tr>
+                        <td>Add steganography:</td>
+                        <td><input type="checkbox" id="add_steganography" checked/></td>
+                    </tr>
+                </table>
             </form>
         </div>
     </body>

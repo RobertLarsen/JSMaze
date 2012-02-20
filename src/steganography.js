@@ -28,8 +28,9 @@ Steganography.prototype.initialize = function(alphabet, maze, solution, text) {
 
 Steganography.prototype.paint = function(context) {
     this._maze.eachCell(function(cell) {
-        var ch = this._cell_letter_table[cell.getId()];
-        var center = cell.getCenter();
-        context.fillText(ch, center.x, center.y);
+        var ch = this._cell_letter_table[cell.getId()],
+            center = cell.getCenter(),
+            metrics = context.measureText(ch);
+        context.fillText(ch, center.x - metrics.width / 2, center.y);
     }, this);
 };
