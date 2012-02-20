@@ -162,6 +162,8 @@
                     var steps = parseInt($('#Algorithm').find('input:eq(0)').val()),
                         frames = parseInt($('#Algorithm').find('input:eq(1)').val());
                     maze = createMaze();
+                    solution = null;
+                    steganography = null;
                     resizeCanvasAndPaint();
                     var algo = getAlgorithm();
                     algo.initialize(maze);
@@ -181,6 +183,8 @@
                     return false;
                 });
                 $('.algorithm_finish').click(function() {
+                    solution = null;
+                    steganography = null;
                     getAlgorithm().generate(maze = createMaze());
                     solution = createSolution(new SimpleSolver(), maze);
                     resizeCanvasAndPaint();
