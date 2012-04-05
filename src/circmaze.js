@@ -1,4 +1,5 @@
 var CircMaze = function(x, y, diameter, rings, minCellCircumference) {
+    var i;
     this._x = x;
     this._y = y;
     this._diameter = diameter;
@@ -6,7 +7,7 @@ var CircMaze = function(x, y, diameter, rings, minCellCircumference) {
     this._rings = [];
     this._rings.push(new CircMaze.Ring(this, 0, diameter / 2 / rings, 1));
     this._rings.push(new CircMaze.Ring(this, 1, diameter / 2 / rings * 2, this._rings[0].calculateNumCells()));
-    for (var i = 2; i < rings; i++) {
+    for (i = 2; i < rings; i++) {
         this._rings.push(new CircMaze.Ring(this, i, diameter / 2 / rings * (i + 1)));
     }
     this.eachCell(function(c) {
@@ -79,22 +80,24 @@ CircMaze.Cell.prototype.getId = function() {
 };
 
 CircMaze.Cell.prototype.getCenter = function() {
-    var center = null;
+    var center = null,
+        a, rDiff, r;
     if (this._ring._nr === 0) {
         center = {
             'x' : this._ring._maze._x,
             'y' : this._ring._maze._y
         };
     } else {
-        var a = (this._startAngle + this._endAngle) / 2,
-            rDiff = this._ring._radius / (this._ring._nr + 1),
-            r = this._ring._radius - rDiff / 2;
+        a = (this._startAngle + this._endAngle) / 2;
+        rDiff = this._ring._radius / (this._ring._nr + 1);
+        r = this._ring._radius - rDiff / 2;
         center = { 'x' : this._ring._maze._x + Math.cos(a) * r, 'y' : this._ring._maze._y + Math.sin(a) * r };
     }
     return center;
 };
 
 CircMaze.Cell.prototype.paint = function(context) {
+    var x1, y1, x2, y2;
     this.getAllNeighbours().forEach(function(n) {
         if (this.wallIsMine(n) && this._walls["w" + n.getId()] === true) {
             this.paintWallTo(context, n);
@@ -105,10 +108,10 @@ CircMaze.Cell.prototype.paint = function(context) {
         context.save();
         context.beginPath();
 
-        var x1 = this._ring._maze._x + Math.cos(this._startAngle) * this._ring._radius;
-        var y1 = this._ring._maze._x + Math.sin(this._startAngle) * this._ring._radius;
-        var x2 = this._ring._maze._x + Math.cos(this._endAngle) * this._ring._radius;
-        var y2 = this._ring._maze._x + Math.sin(this._endAngle) * this._ring._radius;
+        x1 = this._ring._maze._x + Math.cos(this._startAngle) * this._ring._radius;
+        y1 = this._ring._maze._x + Math.sin(this._startAngle) * this._ring._radius;
+        x2 = this._ring._maze._x + Math.cos(this._endAngle) * this._ring._radius;
+        y2 = this._ring._maze._x + Math.sin(this._endAngle) * this._ring._radius;
 
         context.moveTo(x1, y1);
         context.lineTo(x2, y2);
@@ -120,27 +123,28 @@ CircMaze.Cell.prototype.paint = function(context) {
 
 CircMaze.Cell.prototype.paintWallTo = function(context, neighbour) {
     var randomColor = function() {
-        var hex = "0123456789abcdef";
-        return hex.charAt(Math.floor(Math.random() * 16)) + 
-               hex.charAt(Math.floor(Math.random() * 16)) +
-               hex.charAt(Math.floor(Math.random() * 16));
-    };
+            var hex = "0123456789abcdef";
+            return hex.charAt(Math.floor(Math.random() * 16)) + 
+                   hex.charAt(Math.floor(Math.random() * 16)) +
+                   hex.charAt(Math.floor(Math.random() * 16));
+        },
+        x1, y1, x2, y2,
+        innerRadius, outerRadius,
+        start, end;
 
     context.save();
     context.beginPath();
 
-    var x1, y1, x2, y2;
-
     if (neighbour._ring === this._ring) {
-        var innerRadius = (this._ring._nr === 0 ? 0 : this._ring._maze._rings[this._ring._nr - 1]._radius);
-        var outerRadius = this._ring._radius;
+        innerRadius = (this._ring._nr === 0 ? 0 : this._ring._maze._rings[this._ring._nr - 1]._radius);
+        outerRadius = this._ring._radius;
         x1 = this._ring._maze._x + Math.cos(this._endAngle) * innerRadius;
         y1 = this._ring._maze._x + Math.sin(this._endAngle) * innerRadius;
         x2 = this._ring._maze._x + Math.cos(this._endAngle) * outerRadius;
         y2 = this._ring._maze._x + Math.sin(this._endAngle) * outerRadius;
     } else {
-        var start = Math.max(this._startAngle, neighbour._startAngle);
-        var end   = Math.min(this._endAngle, neighbour._endAngle);
+        start = Math.max(this._startAngle, neighbour._startAngle);
+        end   = Math.min(this._endAngle, neighbour._endAngle);
         x1 = this._ring._maze._x + Math.cos(start) * this._ring._radius;
         y1 = this._ring._maze._x + Math.sin(start) * this._ring._radius;
         x2 = this._ring._maze._x + Math.cos(end) * this._ring._radius;
@@ -156,10 +160,10 @@ CircMaze.Cell.prototype.paintWallTo = function(context, neighbour) {
 
 CircMaze.Cell.prototype.wallIsMine = function(neighbour) {
     var anglesEqual = function(a1, a2) {
-        var diff = Math.abs(a1 - a2);
-        return diff < 0.00001 || Math.abs(diff - Math.PI * 2) < 0.00001;
-    };
-    var result = this._ring._nr === (neighbour._ring._nr - 1) ||
+            var diff = Math.abs(a1 - a2);
+            return diff < 0.00001 || Math.abs(diff - Math.PI * 2) < 0.00001;
+        },
+        result = this._ring._nr === (neighbour._ring._nr - 1) ||
            (this._ring === neighbour._ring &&
             anglesEqual(this._endAngle, neighbour._startAngle));
 
@@ -210,9 +214,10 @@ CircMaze.Cell.prototype.breakWallTo = function(neighbour) {
 };
 
 CircMaze.Cell.prototype.getAllNeighbours = function() {
+    var n;
     if (this._neighbours.length === 0) {
         if (this._ring._nr > 0) {
-            var n = this._ring._cells.length;
+            n = this._ring._cells.length;
             this._neighbours.push(this._ring._cells[(this._idx + 1) % n]);
             this._neighbours.push(this._ring._cells[(this._idx + n - 1) % n]);
         }
@@ -228,18 +233,19 @@ CircMaze.Cell.prototype.getAllNeighbours = function() {
 };
 
 CircMaze.Ring = function(maze, nr, radius, numCells) {
+    var num, arc, neighbourRing, lastId, i;
     this._maze = maze;
     this._nr = nr;
     this._radius = radius;
 
-    var num = numCells || this.calculateNumCells(),
-        arc = 2 * Math.PI / num,
-        neighbourRing = (nr === 0 ? null : maze._rings[nr - 1]),
-        lastId = (neighbourRing === null ? 0 : neighbourRing._cells[neighbourRing._cells.length - 1].getId() + 1);
+    num = numCells || this.calculateNumCells();
+    arc = 2 * Math.PI / num;
+    neighbourRing = (nr === 0 ? null : maze._rings[nr - 1]);
+    lastId = (neighbourRing === null ? 0 : neighbourRing._cells[neighbourRing._cells.length - 1].getId() + 1);
 
     this._cells = new Array(num);
 
-    for (var i = 0; i < num; i++) {
+    for (i = 0; i < num; i++) {
         this._cells[i] = new CircMaze.Cell(lastId + i, this, i, i * arc, (i + 1) * arc);
     }
 };
@@ -255,10 +261,12 @@ CircMaze.Ring.prototype.getCircumference = function() {
 };
 
 CircMaze.Ring.prototype.calculateNumCells = function() {
-    var num = Math.floor(this.getCircumference() / this._maze._minCellCircumference);
+    var num = Math.floor(this.getCircumference() / this._maze._minCellCircumference),
+        neighbourCircle,
+        doubleCells;
     if (this._nr > 0) {
-        var neighbourCircle = this._maze._rings[this._nr - 1],
-            doubleCells = neighbourCircle._cells.length * 2;
+        neighbourCircle = this._maze._rings[this._nr - 1];
+        doubleCells = neighbourCircle._cells.length * 2;
 
         num = (doubleCells <= num ? doubleCells : neighbourCircle._cells.length);
     }
@@ -266,14 +274,15 @@ CircMaze.Ring.prototype.calculateNumCells = function() {
 };
 
 CircMaze.Ring.prototype.getCellsInArc = function(startAngle, endAngle) {
+    var c = [],
+        sa, ea;
     if (startAngle > endAngle) {
         endAngle += Math.PI * 2;
     }
 
-    var c = [];
     this._cells.forEach(function(cell) {
-        var sa = cell._startAngle;
-        var ea = cell._endAngle;
+        sa = cell._startAngle;
+        ea = cell._endAngle;
         if (sa > ea) {
             ea += Math.PI * 2;
         }

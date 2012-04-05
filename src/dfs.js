@@ -18,14 +18,15 @@ DFSMazeGenerator.prototype.initialize = function(maze) {
 };
 
 DFSMazeGenerator.prototype.step = function() {
-    var result = false;
+    var result = false,
+        neighbours, next;
     if (this._visited < this._allCells.length) {
-        var neighbours = this._current.getAllNeighbours().filter(this._unvisitedNeighbourFilter);
+        neighbours = this._current.getAllNeighbours().filter(this._unvisitedNeighbourFilter);
         if (neighbours.length === 0) {
             /* No unvisited neighbours */
             this._current = this._stack.pop();
         } else {
-            var next = neighbours.random();
+            next = neighbours.random();
             this._current.breakWallTo(next);
             this._stack.push(this._current);
             this._current = next;

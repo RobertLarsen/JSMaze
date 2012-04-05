@@ -1,11 +1,12 @@
 var RectMaze = function(rows, cols, cellWidth, cellHeight) {
+    var r, c;
     this._rows = rows;
     this._cols = cols;
     this._cellWidth = cellWidth;
     this._cellHeight= cellHeight;
     this._cells = [];
-    for (var r = 0; r < rows; r++) {
-        for (var c = 0; c < cols; c++) {
+    for (r = 0; r < rows; r++) {
+        for (c = 0; c < cols; c++) {
             this._cells.push(new RectMaze.Cell(this, r, c));
         }
     }
@@ -90,15 +91,16 @@ RectMaze.Cell.prototype.hasNorthWall = function() {
 };
 
 RectMaze.Cell.prototype.getNeighbour = function(direction) {
+    var neighbours, n, i;
     switch (direction) {
         case RectMaze.Cell.NORTH : return this._maze.getCell(this._row - 1, this._col);
         case RectMaze.Cell.SOUTH : return this._maze.getCell(this._row + 1, this._col);
         case RectMaze.Cell.EAST  : return this._maze.getCell(this._row, this._col + 1);
         case RectMaze.Cell.WEST  : return this._maze.getCell(this._row, this._col - 1);
         case RectMaze.Cell.ALL   :
-            var neighbours = [];
-            for (var i = 0; i < 4; i++) {
-                var n = this.getNeighbour(i);
+            neighbours = [];
+            for (i = 0; i < 4; i++) {
+                n = this.getNeighbour(i);
                 if (n) {
                     neighbours.push(n);
                 }
@@ -108,7 +110,8 @@ RectMaze.Cell.prototype.getNeighbour = function(direction) {
 };
 
 RectMaze.Cell.prototype.getNeighbourDirection = function(neighbour) {
-    for (var i = 0; i < 4; i++) {
+    var i;
+    for (i = 0; i < 4; i++) {
         if (this.getNeighbour(i) === neighbour) {
             return i;
         }
@@ -169,10 +172,10 @@ RectMaze.Cell.prototype.getCenter = function() {
 };
 
 RectMaze.Cell.prototype.paint = function(context) {
-    var w = this._maze._cellWidth;
-    var h = this._maze._cellHeight;
-    var x = this._col * w;
-    var y = this._row * h;
+    var w = this._maze._cellWidth,
+        h = this._maze._cellHeight,
+        x = this._col * w,
+        y = this._row * h;
 
     if (this.hasNorthWall()) {
         context.beginPath();

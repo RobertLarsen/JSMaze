@@ -4,16 +4,17 @@
  */
 if (!Array.prototype.filter) {
     Array.prototype.filter = function(fun /*, thisp*/) {
-        var len = this.length >>> 0;
+        var len = this.length >>> 0,
+            res, thisp, i, val;
         if (typeof fun != "function") {
             throw new TypeError();
         }
 
-        var res = [];
-        var thisp = arguments[1];
-        for (var i = 0; i < len; i++) {
+        res = [];
+        thisp = arguments[1];
+        for (i = 0; i < len; i++) {
             if (i in this) {
-                var val = this[i]; // in case fun mutates this
+                val = this[i]; // in case fun mutates this
                 if (fun.call(thisp, val, i, this)) {
                     res.push(val);
                 }
@@ -54,16 +55,17 @@ Maze.Cell.prototype.getId = function() { };
 Maze.Cell.prototype.getCenter = function() { };
 Maze.Cell.prototype.paint = function(context) { };
 Maze.Cell.prototype.paintPathThrough = function(context, fromCell, toCell) {
-    var c = this.getCenter();
+    var c = this.getCenter(),
+        f;
     if (fromCell !== null) {
-        var f = fromCell.getCenter();
+        f = fromCell.getCenter();
         context.beginPath();
         context.moveTo(f.x, f.y);
         context.lineTo(c.x, c.y);
         context.stroke();
     }
     if (toCell !== null) {
-        var f = toCell.getCenter();
+        f = toCell.getCenter();
         context.beginPath();
         context.moveTo(f.x, f.y);
         context.lineTo(c.x, c.y);

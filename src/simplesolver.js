@@ -21,10 +21,11 @@ SimpleSolver.prototype.getSolution = function() {
 };
 
 SimpleSolver.prototype.step = function() {
-    var stepMade = false;
+    var stepMade = false,
+        idx, cur, next, reachable, filtered;
 
-    var idx = this._steps.length - 1;
-    var cur = this._steps[idx];
+    idx = this._steps.length - 1;
+    cur = this._steps[idx];
     if (cur !== this._endCell) {
         //We have not yet reached the end
         if (this._stepNeighbours[idx].length === 0) {
@@ -32,9 +33,9 @@ SimpleSolver.prototype.step = function() {
             this._stepNeighbours.pop();
             this._steps.pop();
         } else {
-            var next = this._stepNeighbours[idx].pop();
-            var reachable = next.getReachableNeighbours();
-            var filtered = reachable.filter(function(n) { return n !== cur; });
+            next = this._stepNeighbours[idx].pop();
+            reachable = next.getReachableNeighbours();
+            filtered = reachable.filter(function(n) { return n !== cur; });
 
             this._steps.push(next);
             this._stepNeighbours.push(filtered);

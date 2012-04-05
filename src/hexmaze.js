@@ -1,12 +1,13 @@
 var HexMaze = function(rows, cols, radius) {
+    var row, c, r;
     this.rows = rows;
     this.cols = cols;
     this.radius = radius;
     this.cells = [];
-    for (var r = 0; r < rows; r++) {
-        var row = [];
+    for (r = 0; r < rows; r++) {
+        row = [];
         this.cells.push(row);
-        for (var c = 0; c < (r % 2 === 0 ? cols : cols - 1); c++) {
+        for (c = 0; c < (r % 2 === 0 ? cols : cols - 1); c++) {
             row.push(new HexMaze.Cell(this, r, c));
         }
     }
@@ -43,8 +44,9 @@ HexMaze.prototype.getCellRadius = function() {
 };
 
 HexMaze.prototype.eachCell = function(callback, obj) {
-    for (var r = 0; r < this.cells.length; r++) {
-        for (var c = 0; c < this.cells[r].length; c++) {
+    var r, c;
+    for (r = 0; r < this.cells.length; r++) {
+        for (c = 0; c < this.cells[r].length; c++) {
             callback.call(obj || window, this.cells[r][c], r, c);
         }
     }
@@ -75,32 +77,34 @@ HexMaze.Cell.NORTH_EAST = 5;
 
 HexMaze.Cell.prototype.setPath = function(context) {
     var r = this.maze.getCellRadius(),
-        c = this.getCenter();
+        c = this.getCenter(),
+        i;
     context.beginPath();
     context.moveTo(c.x + r, c.y);
-    for (var i = 0; i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         context.lineTo(c.x + HexMaze.COS_TABLE[i] * r, c.y + HexMaze.SIN_TABLE[i] * r);
     }
     context.closePath();
 };
 
 HexMaze.Cell.prototype.getCenter = function() {
-    var r = this.maze.getCellRadius();
-    var halfHeight = HexMaze.SIN_TABLE[1] * r;
+    var r = this.maze.getCellRadius(),
+        halfHeight = HexMaze.SIN_TABLE[1] * r,
+        x, y;
 
-    var x = (this.row % 2 === 0) ? (3 * r) * this.col + r : 2 * r * (this.col + 1) + (r / 2) * (this.col * 2 + 1);
-    var y = (this.row + 1) * halfHeight;
+    x = (this.row % 2 === 0) ? (3 * r) * this.col + r : 2 * r * (this.col + 1) + (r / 2) * (this.col * 2 + 1);
+    y = (this.row + 1) * halfHeight;
 
     return { 'y' : y, 'x' : x };
 };
 
 HexMaze.Cell.prototype.paint = function(context) {
-    var r = this.maze.getCellRadius();
-
-    var center = this.getCenter();
+    var r = this.maze.getCellRadius(),
+        center = this.getCenter(),
+        i;
 
     context.save();
-    for (var i = 0; i < 6; i++) {
+    for (i = 0; i < 6; i++) {
         if (this.hasWall(i)) {
             context.beginPath();
             context.moveTo(center.x + HexMaze.COS_TABLE[i] * r, center.y + HexMaze.SIN_TABLE[i] * r);
@@ -154,6 +158,7 @@ HexMaze.Cell.prototype.breakWallTo = function(neighbour) {
 };
 
 HexMaze.Cell.prototype.getNeighbour = function(direction) {
+    var neighbours, i, n;
     switch (direction) {
         case HexMaze.Cell.SOUTH_EAST : return this.maze.getCell(this.row + 1, (this.row % 2 === 0) ? this.col : this.col + 1);
         case HexMaze.Cell.SOUTH      : return this.maze.getCell(this.row + 2, this.col);
@@ -162,9 +167,9 @@ HexMaze.Cell.prototype.getNeighbour = function(direction) {
         case HexMaze.Cell.NORTH      : return this.maze.getCell(this.row - 2, this.col);
         case HexMaze.Cell.NORTH_EAST : return this.maze.getCell(this.row - 1, (this.row % 2 === 0) ? this.col : this.col + 1);
         case HexMaze.Cell.ALL        :
-            var neighbours = [];
-            for (var i = 0; i < 6; i++) {
-                var n = this.getNeighbour(i);
+            neighbours = [];
+            for (i = 0; i < 6; i++) {
+                n = this.getNeighbour(i);
                 if (n) {
                     neighbours.push(n);
                 }
@@ -178,7 +183,8 @@ Maze.Cell.prototype.getAllNeighbours = function() {
 };
 
 HexMaze.Cell.prototype.getNeighbourDirection = function(neighbour) {
-    for (var i = 0; i < 6; i++) {
+    var i;
+    for (i = 0; i < 6; i++) {
         if (this.getNeighbour(i) === neighbour) {
             return i;
         }

@@ -11,8 +11,8 @@ Solver.prototype.generate = function(maze, start, end) {
 };
 
 Solver.prototype.paint = function(context) {
-    var previous = null;
-    var current = null;
+    var previous = null,
+        current = null;
     this.getSolution().forEach(function(next) {
         if (current !== null) {
             current.paintPathThrough(context, previous, next);

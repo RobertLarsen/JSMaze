@@ -7,6 +7,7 @@ var Steganography = function() {
 };
 
 Steganography.prototype.initialize = function(alphabet, maze, solution, text, font_size) {
+    var randomCharacter, i;
     this._alphabet = alphabet;
     this._maze = maze;
     this._solution = solution;
@@ -14,13 +15,13 @@ Steganography.prototype.initialize = function(alphabet, maze, solution, text, fo
     this._cell_letter_table = [];
     this._font_size = font_size;
 
-    var randomCharacter = function() {
+    randomCharacter = function() {
         return alphabet.charAt(Math.floor(Math.random() * alphabet.length));
     };
     maze.eachCell(function(c) {
         this._cell_letter_table[c.getId()] = randomCharacter();
     }, this);
-    var i = 0;
+    i = 0;
     solution.forEach(function(c) {
         var ch = (i >= text.length ? this._cell_letter_table[c.getId()] : text.charAt(i));
         i++;

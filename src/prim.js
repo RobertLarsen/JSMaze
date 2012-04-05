@@ -18,16 +18,17 @@ PrimMazeGenerator.prototype.initialize = function(maze) {
 };
 
 PrimMazeGenerator.prototype.step = function() {
-    var result = false;
+    var result = false,
+        idx, cell, neighbours, next;
     if (this._visited < this._allCells.length) {
-        var idx = Math.floor(Math.random() * this._cloud.length);
-        var cell = this._cloud[idx];
-        var neighbours = cell.getAllNeighbours().filter(this._unvisitedNeighbourFilter);
+        idx = Math.floor(Math.random() * this._cloud.length);
+        cell = this._cloud[idx];
+        neighbours = cell.getAllNeighbours().filter(this._unvisitedNeighbourFilter);
         if (neighbours.length === 0) {
             /* This cell has no unvisited neighbours */
             this._cloud.splice(idx, 1);
         } else {
-            var next = neighbours.random();
+            next = neighbours.random();
             cell.breakWallTo(next);
             this._cloud.push(next);
             this._visited++;

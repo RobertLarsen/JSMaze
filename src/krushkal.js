@@ -29,16 +29,17 @@ KrushkalMazeGenerator.prototype.initialize = function(maze) {
 };
 
 KrushkalMazeGenerator.prototype.step = function() {
-    var result = false;
+    var result = false,
+        idx, cell, id, tree, that = this, neighbours, neighbour,
+        neighbourId, neighbourTree;
     if (this._cells_to_tree[0].cells.length < this._all_cells.length) {
-        var idx = Math.floor(Math.random() * this._cells_to_consider.length);
-        var cell = this._cells_to_consider[idx];
-        var id = cell.getId();
-        var tree = this._cells_to_tree[id];
+        idx = Math.floor(Math.random() * this._cells_to_consider.length);
+        cell = this._cells_to_consider[idx];
+        id = cell.getId();
+        tree = this._cells_to_tree[id];
         
-        var that = this;
-        var neighbours = cell.getAllNeighbours().filter(function(neighbour) {
-            var i = neighbour.getId();
+        neighbours = cell.getAllNeighbours().filter(function(neighbour) {
+            i = neighbour.getId();
             return tree !== that._cells_to_tree[i];
         });
 
@@ -46,10 +47,10 @@ KrushkalMazeGenerator.prototype.step = function() {
             /* All neighbours are in same tree so dont consider this cell again */
             this._cells_to_consider.splice(idx, 1);
         } else {
-            var neighbour = neighbours.random();
+            neighbour = neighbours.random();
             cell.breakWallTo(neighbour);
-            var neighbourId = neighbour.getId();
-            var neighbourTree = this._cells_to_tree[neighbourId];
+            neighbourId = neighbour.getId();
+            neighbourTree = this._cells_to_tree[neighbourId];
             if (neighbourTree.cells.length < tree.cells.length) {
                 this._moveToTree(neighbourTree, tree);
             } else {
