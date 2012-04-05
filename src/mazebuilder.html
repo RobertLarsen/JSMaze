@@ -79,7 +79,7 @@
                         });
                     }
 
-                    if (steganography === null && $('#add_steganography').attr('checked')) {
+                    if (solution !== null && steganography === null && $('#add_steganography').attr('checked')) {
                         steganography = new Steganography();
                         var alphabet = $('#alphabet').val(),
                             text = $('#stego_text').val(),
